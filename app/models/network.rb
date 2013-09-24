@@ -18,7 +18,7 @@ class Network
 
   def projects(url, api_opts, scope = :public)
     opts = {
-      query: api_opts.merge(per_page: 1000),
+      query: api_opts,
       headers: {"Content-Type" => "application/json"},
     }
 
@@ -27,6 +27,23 @@ class Network
             else
              'projects.json'
             end
+
+    response = self.class.get(url + api_prefix + query, opts)
+
+    if response.code == 200
+      response.parsed_response
+    else
+      nil
+    end
+  end
+
+  def project(url, api_opts, project_id)
+    opts = {
+      query: api_opts,
+      headers: {"Content-Type" => "application/json"},
+    }
+
+    query = "projects/#{project_id}.json"
 
     response = self.class.get(url + api_prefix + query, opts)
 

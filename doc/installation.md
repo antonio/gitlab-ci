@@ -40,7 +40,12 @@ Install the Bundler Gem:
     sudo gem install bundler --no-ri --no-rdoc
 
 
-## 3. Prepare the database
+## 3. GitLab CI user:
+
+    sudo adduser --disabled-login --gecos 'GitLab CI' gitlab_ci
+
+
+## 4. Prepare the database
 
 You can use either MySQL or PostgreSQL.
 
@@ -82,14 +87,7 @@ You can use either MySQL or PostgreSQL.
     template1=# \q
 
     # Try connecting to the new database with the new user
-    sudo -u git -H psql -d gitlab_ci_production
-
-
-
-## 4. GitLab CI user:
-
-    sudo adduser --disabled-login --gecos 'GitLab CI' gitlab_ci
-
+    sudo -u gitlab_ci -H psql -d gitlab_ci_production
 
 ## 5. Get code 
 
@@ -110,18 +108,18 @@ You can use either MySQL or PostgreSQL.
     sudo -u gitlab_ci -H vim config/puma.rb
 
     # Create socket and pid directories
-    sudo -u gitlab_ci -H mkdir tmp/sockets/
+    sudo -u gitlab_ci -H mkdir -p tmp/sockets/
     sudo chmod -R u+rwX  tmp/sockets/
-    sudo -u gitlab_ci -H mkdir tmp/pids/
+    sudo -u gitlab_ci -H mkdir -p tmp/pids/
     sudo chmod -R u+rwX  tmp/pids/
 
 ### Install gems
  
-    # mysql
-    sudo -u gitlab_ci -H bundle --without development test postgres --deployment
+    # For MySQL (note, the option says "without ... postgres")
+    sudo -u gitlab_ci -H bundle install --without development test postgres --deployment
 
-    # postgres
-    sudo -u gitlab_ci -H bundle --without development test mysql --deployment
+    # Or for PostgreSQL (note, the option says "without ... mysql")
+    sudo -u gitlab_ci -H bundle install --without development test mysql --deployment
 
 ### Setup db
 
@@ -138,16 +136,16 @@ You can use either MySQL or PostgreSQL.
     sudo -u gitlab_ci -H bundle exec rake db:setup RAILS_ENV=production
     
 
-    # Setup scedules 
+    # Setup schedules
     #
     sudo -u gitlab_ci -H bundle exec whenever -w RAILS_ENV=production
    
 
 ## 7. Install Init Script
 
-Download the init script (will be /etc/init.d/gitlab_ci):
+Copy the init script (will be /etc/init.d/gitlab_ci):
 
-    sudo wget https://raw.github.com/gitlabhq/gitlab-ci/master/lib/support/init.d/gitlab_ci -P /etc/init.d/
+    sudo cp /home/gitlab_ci/gitlab-ci/lib/support/init.d/gitlab_ci /etc/init.d/gitlab_ci
     sudo chmod +x /etc/init.d/gitlab_ci
 
 Make GitLab start on boot:
@@ -172,7 +170,7 @@ Start your GitLab instance:
 
 Download an example site config:
 
-    sudo wget https://raw.github.com/gitlabhq/gitlab-ci/master/lib/support/nginx/gitlab_ci -P /etc/nginx/sites-available/
+    sudo cp /home/gitlab_ci/gitlab-ci/lib/support/nginx/gitlab_ci /etc/nginx/sites-available/gitlab_ci
     sudo ln -s /etc/nginx/sites-available/gitlab_ci /etc/nginx/sites-enabled/gitlab_ci
 
 Make sure to edit the config file to match your setup:
@@ -182,9 +180,9 @@ Make sure to edit the config file to match your setup:
     # of your host serving GitLab CI
     sudo vim /etc/nginx/sites-enabled/gitlab_ci
 
-## Restart
+## Reload configuration
 
-    sudo /etc/init.d/nginx restart
+    sudo /etc/init.d/nginx reload
 
 
 

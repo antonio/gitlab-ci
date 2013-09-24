@@ -44,9 +44,11 @@ class Project < ActiveRecord::Base
 
   before_validation :set_default_values
 
-  def self.from_gitlab(user, scope = :public)
+  def self.from_gitlab(user, page, per_page, scope = :owned)
     opts = {
-      private_token: user.private_token
+      private_token: user.private_token,
+      per_page: per_page,
+      page: page,
     }
 
     projects = Network.new.projects(user.url, opts, scope)
@@ -146,7 +148,7 @@ class Project < ActiveRecord::Base
   end
 
   def no_running_builds?
-    # Get running builds not later than 3 days ago to ignore hungs
+    # Get running builds not later than 3 days ago to ignore hangs
     builds.running.where("updated_at > ?", 3.days.ago).empty?
   end
 end

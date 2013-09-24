@@ -17,10 +17,13 @@
 #
 
 $ ->
+  $('.sync-now').on 'click', ->
+    alert(1)
+    $(this).addClass('icon-spin')
   $('.edit-runner-link').on 'click', ->
     descr = $(this).closest('.runner-description').first()
     descr.hide()
     descr.next('.runner-description-form').show()
 
   $('.assign-all-runner').on 'click', ->
-    $(this).replaceWith('<i class="icon-refresh icon-spin"></i> Assign in progres..')
+    $(this).replaceWith('<i class="icon-refresh icon-spin"></i> Assign in progress..')
